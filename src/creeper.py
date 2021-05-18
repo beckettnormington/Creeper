@@ -9,7 +9,8 @@ class CreeperLexer(Lexer):
     literals = { '=', '+', '-', '/',
                  '*', '(', ')', ',',
                  ';', '&', '(', ')',
-                 ':', '.', '`', '@',}
+                 ':', '.', '`', '@',
+                 '%' }
 
 
     # define tokens as regular expressions
@@ -51,7 +52,7 @@ class CreeperParser(Parser):
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
-        ('left', '&'),
+        ('left', '&', '%'),
         ('right', 'UMINUS'),
     )
 
@@ -107,6 +108,10 @@ class CreeperParser(Parser):
     @_('expr "+" expr')
     def expr(self, p):
         return ('add', p.expr0, p.expr1)
+        
+    @_('expr "%" expr')
+    def expr(self, p):
+        return ('mod', p.expr0, p.expr1)
 
     @_('expr "-" expr')
     def expr(self, p):
@@ -182,6 +187,8 @@ class CreeperExecute:
 
         if node[0] == 'add':
             return self.walkTree(node[1]) + self.walkTree(node[2])
+        elif node[0] == 'mod':
+            return self.walkTree(node[1]) % self.walkTree(node[2])
         elif node[0] == 'sub':
             return self.walkTree(node[1]) - self.walkTree(node[2])
         elif node[0] == 'mul':
@@ -235,7 +242,7 @@ class CreeperExecute:
                 for line in do_string:
                     tree = parser.parse(lexer.tokenize(line))
                     CreeperExecute(tree, env)
-            return node[1]
+            return
 
         if node[0] == 'var_assign':
             self.env[node[1]] = self.walkTree(node[2])
@@ -261,11 +268,11 @@ if __name__ == '__main__':
         for line in contents:
             tree = parser.parse(lexer.tokenize(line))
             CreeperExecute(tree, env)
+        f.close()
     except IndexError:
         print('Creeper did not detect specified filename to execute. Launching interpreter...')
 
         while True:
-
             try:
                 text = input('Creeper >> ')
 
@@ -273,7 +280,7 @@ if __name__ == '__main__':
                 break
 
             if text and text.lower() != 'exit()':
-                if text.lower != "exit()":
+                if text.lower != "exit":
                     tree = parser.parse(lexer.tokenize(text))
                     # print(tree)
                     CreeperExecute(tree, env)
