@@ -5,14 +5,14 @@ Creeper is a dynamic, interpreted language.
 
 ## Demo
 
-In this quick demo, I will explain how to write a basic program in Creeper that will display ten numbers of the Fibonacci sequence. I recommend using our Visual Studio Code extension while writing your program. You can get it [here](https://marketplace.visualstudio.com/items?itemName=Chatter.creeper-language).
+Here's a basic program in Creeper that will display ten numbers of the Fibonacci sequence. I recommend using our Visual Studio Code extension while writing your program. You can get it [here](https://marketplace.visualstudio.com/items?itemName=Chatter.creeper-language).
 
 ```swift
 // Creeper program to display the first few numbers of the Fibonacci sequence
 
 // Declare our variables
-var a = 0
-var b = 1
+var a = 1
+var b = 0
 var c = 0
 // Main 'do' loop that performs the algorithm 10 times
 do "c; var c = a + b; var a = b; var b = c" 10 times
@@ -25,16 +25,16 @@ python creeper.py {filename}.cre
 Expected output:
 ```
 Creeper Interpreter
-0
-1
-2
-3
-5
-8
+0 
+1 
+1 
+2 
+3 
+5 
+8 
 13
 21
 34
-55
 ```
 ## DISCLAIMER
 Creeper is currently very young, and therefore lacks important features. Feature updates will occur very regularly.
