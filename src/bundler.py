@@ -42,7 +42,8 @@ class CreeperLexer(Lexer):
     literals = { '=', '+', '-', '/',
                  '*', '(', ')', ',',
                  ';', '&', '(', ')',
-                 ':', '.', '`', '@',}
+                 ':', '.', '`', '@',
+                 '%' }
 
 
     # define tokens as regular expressions
@@ -74,9 +75,9 @@ class CreeperLexer(Lexer):
     def COMMENT(self, t):
         pass
 
-    @_(r'\\n+')
+    @_(r'\n+')
     def newline(self, t):
-        self.lineno = t.value.count('\\n')
+        self.lineno = t.value.count('\n')
 
 class CreeperParser(Parser):
     tokens = CreeperLexer.tokens
@@ -84,7 +85,7 @@ class CreeperParser(Parser):
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
-        ('left', '&'),
+        ('left', '&', '%'),
         ('right', 'UMINUS'),
     )
 
@@ -140,6 +141,10 @@ class CreeperParser(Parser):
     @_('expr "+" expr')
     def expr(self, p):
         return ('add', p.expr0, p.expr1)
+        
+    @_('expr "%" expr')
+    def expr(self, p):
+        return ('mod', p.expr0, p.expr1)
 
     @_('expr "-" expr')
     def expr(self, p):
@@ -215,6 +220,8 @@ class CreeperExecute:
 
         if node[0] == 'add':
             return self.walkTree(node[1]) + self.walkTree(node[2])
+        elif node[0] == 'mod':
+            return self.walkTree(node[1]) % self.walkTree(node[2])
         elif node[0] == 'sub':
             return self.walkTree(node[1]) - self.walkTree(node[2])
         elif node[0] == 'mul':
@@ -222,7 +229,7 @@ class CreeperExecute:
         elif node[0] == 'div':
             return self.walkTree(node[1]) / self.walkTree(node[2])
         elif node[0] == 'concat':
-            tempString = re.sub('["\\']', '', str(self.walkTree(node[1])) + str(self.walkTree(node[2])))
+            tempString = re.sub('["\']', '', str(self.walkTree(node[1])) + str(self.walkTree(node[2])))
             return f'"{tempString}"'
 
         if node[0] == 'function_define':
@@ -268,7 +275,7 @@ class CreeperExecute:
                 for line in do_string:
                     tree = parser.parse(lexer.tokenize(line))
                     CreeperExecute(tree, env)
-            return node[1]
+            return
 
         if node[0] == 'var_assign':
             self.env[node[1]] = self.walkTree(node[2])
